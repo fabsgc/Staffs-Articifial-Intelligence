@@ -25,6 +25,18 @@
     <Filter Include="Lunar">
       <UniqueIdentifier>{b3a71dea-3e10-44e4-a276-34a7f71d3c74}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RainbowIslands">
+      <UniqueIdentifier>{eddeb7f1-1e85-47ff-adef-974c403ef396}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NeuralNetworks_Clustering">
+      <UniqueIdentifier>{1e38d863-f168-4eb5-942f-0c19d44b0ffe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RainbowIslands\NeuralNetwork">
+      <UniqueIdentifier>{decc5561-c0cd-4c6a-94ab-0b9d10fb9f04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RainbowIslands\GeneticAlgorithm">
+      <UniqueIdentifier>{d718508f-0900-4406-a638-9c2902856f9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C2DMatrix.h">
@@ -90,6 +102,63 @@
     <ClInclude Include="GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RainbowIslands\Character.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\CharacterBub.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\CharacterCaterpillar.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\CharacterChest.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\CharacterFruit.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\CharacterRainbow.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\Commons_RainbowIslands.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\Constants_RainbowIslands.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\GameScreen_RainbowIslands.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\LevelMap.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\VirtualJoypad.h">
+      <Filter>RainbowIslands</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetworks_Clustering\ClusteringConstants.h">
+      <Filter>NeuralNetworks_Clustering</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetworks_Clustering\GameScreen_Clustering.h">
+      <Filter>NeuralNetworks_Clustering</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\NeuralNetwork.h">
+      <Filter>RainbowIslands\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\NeuralNetworkHeader.h">
+      <Filter>RainbowIslands\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\Neuron.h">
+      <Filter>RainbowIslands\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\Layer.h">
+      <Filter>RainbowIslands\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\GeneticAlgorithm.h">
+      <Filter>RainbowIslands\GeneticAlgorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="RainbowIslands\Genome.h">
+      <Filter>RainbowIslands\GeneticAlgorithm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameScreen.cpp">
@@ -142,6 +211,51 @@
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\Character.cpp">
+      <Filter>RainbowIslands</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\CharacterBub.cpp">
+      <Filter>RainbowIslands</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\CharacterCaterpillar.cpp">
+      <Filter>RainbowIslands</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\CharacterChest.cpp">
+      <Filter>RainbowIslands</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\CharacterFruit.cpp">
+      <Filter>RainbowIslands</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\CharacterRainbow.cpp">
+      <Filter>RainbowIslands</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\GameScreen_RainbowIslands.cpp">
+      <Filter>RainbowIslands</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\LevelMap.cpp">
+      <Filter>RainbowIslands</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\VirtualJoypad.cpp">
+      <Filter>RainbowIslands</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNetworks_Clustering\GameScreen_Clustering.cpp">
+      <Filter>NeuralNetworks_Clustering</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\NeuralNetwork.cpp">
+      <Filter>RainbowIslands\NeuralNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\Neuron.cpp">
+      <Filter>RainbowIslands\NeuralNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\Layer.cpp">
+      <Filter>RainbowIslands\NeuralNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\GeneticAlgoritm.cpp">
+      <Filter>RainbowIslands\GeneticAlgorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="RainbowIslands\Genome.cpp">
+      <Filter>RainbowIslands\GeneticAlgorithm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

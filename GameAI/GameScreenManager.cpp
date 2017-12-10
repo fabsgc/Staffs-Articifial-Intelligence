@@ -8,6 +8,8 @@
 #include "Conway\GameScreen_Conway.h"
 #include "Lunar\GameScreen_Lunar.h"
 #include "Conway\GameScreen_Conway.h"
+#include "RainbowIslands\GameScreen_RainbowIslands.h"
+#include "NeuralNetworks_Clustering\GameScreen_Clustering.h"
 
 //--------------------------------------------------------------------------------------------------
 
@@ -57,6 +59,8 @@ void GameScreenManager::ChangeScreen(SCREENS newScreen)
 	GameScreen_Chess*			tempChessScreen;
 	GameScreen_Conway*			tempConwayScreen;
 	GameScreen_Lunar*			tempLunarScreen;
+	GameScreen_RainbowIslands*  tempRainbowIslandsScreen;
+	GameScreen_Clustering*      tempClusteringScreen;
 
 	//Initialise the new screen.
 	mCurrentScreenID = newScreen;
@@ -87,9 +91,15 @@ void GameScreenManager::ChangeScreen(SCREENS newScreen)
 		break;
 
 		case SCREEN_CLUSTERING:
+			tempClusteringScreen = new GameScreen_Clustering(mRenderer);
+			mCurrentScreen = (GameScreen*)tempClusteringScreen;
+			tempClusteringScreen = NULL;
 		break;
 
 		case SCREEN_RAINBOWISLANDS:
+			tempRainbowIslandsScreen = new GameScreen_RainbowIslands(mRenderer);
+			mCurrentScreen = (GameScreen*)tempRainbowIslandsScreen;
+			tempRainbowIslandsScreen = NULL;
 		break;
 
 		default:

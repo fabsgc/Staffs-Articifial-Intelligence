@@ -27,10 +27,10 @@ protected:
 	Node Minimise(Node node, int depth, int a, int b);
 	bool MakeAMove(Board* board, Move* move);
 
-	void OrderMoves(Board* board, vector<Move>* moves, bool highToLow);
-	void CropMoves(vector<Move>* moves, unsigned int maxNumberOfMoves);
+	void OrderMoves(vector<Node>* nodes);
+	void CropMoves(vector<Node>* nodes);
 
-	int  ScoreTheBoard(Node node);
+	int ScoreTheBoard(Node node);
 	int EvaluateBoard(Node node, COLOUR colour);
 
 	int getScoreByPieceType(BoardPiece* piece);

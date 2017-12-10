@@ -105,6 +105,8 @@ struct Board
 		for(int x = 0; x < kBoardDimensions; x++)
 			currentLayout[x][6] = BoardPiece(PIECE_PAWN, COLOUR_WHITE);
 
+		//currentLayout[4][2] = BoardPiece(PIECE_PAWN, COLOUR_WHITE);
+		//currentLayout[4][6] = BoardPiece(PIECE_NONE, COLOUR_WHITE);
 	};
 
 	Board(BoardPiece setup[8][8])
@@ -159,11 +161,12 @@ struct Node
 	int score = 0;
 	Board boardState;
 	Move currentMove;
+	vector<Move> availableMoves;
 
 	Node()
 		: score(0)
 	{
-
+		availableMoves.clear();
 	}
 };
 

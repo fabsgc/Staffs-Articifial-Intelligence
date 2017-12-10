@@ -34,7 +34,7 @@ const int kPreTurnTextWidth					= 240;
 const int kPreTurnTextHeight				= 52;
 
 //Search depth in MiniMax Algorithm.
-const unsigned int kSearchDepth				= 4;
+const unsigned int kSearchDepth				= 2;
 
 //Cut the number of moves down per ply.
 //This will be multiplied by current depth.
@@ -44,5 +44,7 @@ const unsigned int kMaxMovesPerPly			= 20;
 const unsigned int kTotalNumberOfStartingPieces = 16;
 
 const unsigned int kInfinity = 200795;
+
+const unsigned int KMaxMovesToCompute = 10;
 
 #endif //CHESSCONSTANTS_H

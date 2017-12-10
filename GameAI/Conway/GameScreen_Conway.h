@@ -8,6 +8,7 @@
 #include "../GameScreen.h"
 #include "../Commons.h"
 #include <SDL.h>
+#include <iterator>
 
 using namespace::std;
 
@@ -15,7 +16,7 @@ class Texture2D;
 
 class GameScreen_Conway : GameScreen
 {
-//--------------------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------
 public:
 	GameScreen_Conway(SDL_Renderer* renderer);
 	~GameScreen_Conway();
@@ -23,17 +24,20 @@ public:
 	void Render();
 	void Update(size_t deltaTime, SDL_Event e);
 
-//--------------------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------
 protected:
 
 	//TODO: Students to code these functions.
-	void UpdateMap()								;//{;}
-	void CreateRandomMap(int percentageInactive)	;//{;}
-	void LoadMap(std::string path)					;//{;}
+	void UpdateMap();//{;}
+	void CreateRandomMap(int percentageInactive);//{;}
+	void LoadMap(std::string path);//{;}
 
-//--------------------------------------------------------------------------------------------------
+	int countNeighbours(int x, int y);
+
+	//--------------------------------------------------------------------------------------------------
 private:
 	int**		mMap;
+	int**       mMapTemp;
 
 	Texture2D*	mWhiteTile;
 	Texture2D*	mBlackTile;

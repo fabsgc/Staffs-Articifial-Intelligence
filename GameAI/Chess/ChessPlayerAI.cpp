@@ -160,18 +160,24 @@ bool ChessPlayerAI::TakeATurn(SDL_Event e)
 
 Node ChessPlayerAI::MiniMax(Node node, int depth)
 {
+	GetAllMoveOptions(node.boardState, mTeamColour, &node.availableMoves);
 	return Maximise(node, depth, 0, 0);
 }
 
 //--------------------------------------------------------------------------------------------------
+
+bool sortNode(Node& left, Node& right) 
+{
+	return left.score < right.score;
+}
 
 Node ChessPlayerAI::Maximise(Node node, int depth, int a, int b)
 {
 	Node bestChildNode;
 	Node bestRealNode;
 	Node tmpNode;
-	vector<Move> moves;
-	int alpha = a;
+	vector<Node> nodes;
+ 	int alpha = a;
 	int beta = b;
 
 	//If we are at the bottom of the tree
@@ -179,22 +185,33 @@ Node ChessPlayerAI::Maximise(Node node, int depth, int a, int b)
 		return node;
 	}
 
-	//Otherwise, we generate all the possible moves from the current state
-	GetAllMoveOptions(node.boardState, mTeamColour, &moves);
+	//We order moves before 
+	for (auto it = node.availableMoves.begin(); it != node.availableMoves.end(); it++)
+	{
+		Node childNode;
+		childNode.score = 0;
+		childNode.currentMove = *it;
+		childNode.boardState = node.boardState;
+
+		MakeAMove(&childNode.boardState, &(*it));
+		childNode.score = ScoreTheBoard(childNode);
+
+		GetAllMoveOptions(childNode.boardState, mTeamColour, &childNode.availableMoves);
+
+		if (node.availableMoves.size() > 0)
+		{
+			nodes.push_back(childNode);
+		}
+	}
+
+	OrderMoves(&nodes);
+	CropMoves(&nodes);
 
 	int i = 0;
 
 	//For each state, we create a new node (board + currentMove) and call minimise
-	for (auto move : moves)
+	for (auto childNode : nodes)
 	{
-		Node childNode;
-		childNode.score = 0;
-		childNode.currentMove = move;
-		childNode.boardState = node.boardState;
-
-		MakeAMove(&childNode.boardState, &move);
-		childNode.score = ScoreTheBoard(childNode);
-
 		if (i == 0)
 		{
 			bestRealNode = childNode;
@@ -213,6 +230,8 @@ Node ChessPlayerAI::Maximise(Node node, int depth, int a, int b)
 		{
 			return bestRealNode;
 		}
+
+		i++;
 	}
 
 	return bestRealNode;
@@ -225,7 +244,7 @@ Node ChessPlayerAI::Minimise(Node node, int depth, int a, int b)
 	Node bestChildNode;
 	Node bestRealNode;
 	Node tmpNode;
-	vector<Move> moves;
+	vector<Node> nodes;
 	int alpha = a;
 	int beta = b;
 
@@ -234,22 +253,33 @@ Node ChessPlayerAI::Minimise(Node node, int depth, int a, int b)
 		return node;
 	}
 
-	//Otherwise, we generate all the possible moves from the current state
-	GetAllMoveOptions(node.boardState, mTeamColour, &moves);
-
-	int i = 0;
-
-	//For each state, we create a new node (board + currentMove) and call minimise
-	for (auto move : moves)
+	//We order moves before 
+	for (auto move : node.availableMoves)
 	{
 		Node childNode;
 		childNode.score = 0;
 		childNode.currentMove = move;
 		childNode.boardState = node.boardState;
-		
+
 		MakeAMove(&childNode.boardState, &move);
 		childNode.score = ScoreTheBoard(childNode);
 
+		GetAllMoveOptions(childNode.boardState, mTeamColour, &childNode.availableMoves);
+
+		if (node.availableMoves.size() > 0)
+		{
+			nodes.push_back(childNode);
+		}
+	}
+
+	OrderMoves(&nodes);
+	CropMoves(&nodes);
+
+	int i = 0;
+
+	//For each state, we create a new node (board + currentMove) and call minimise
+	for (auto childNode : nodes)
+	{
 		if (i == 0)
 		{
 			bestRealNode = childNode;
@@ -275,16 +305,16 @@ Node ChessPlayerAI::Minimise(Node node, int depth, int a, int b)
 
 //--------------------------------------------------------------------------------------------------
 
-void ChessPlayerAI::OrderMoves(Board* board, vector<Move>* moves, bool highToLow)
+void ChessPlayerAI::OrderMoves(vector<Node>* nodes)
 {
-	//TODO
+	std::sort(nodes->begin(), nodes->end(), sortNode);
 }
 
 //--------------------------------------------------------------------------------------------------
 
-void ChessPlayerAI::CropMoves(vector<Move>* moves, unsigned int maxNumberOfMoves)
+void ChessPlayerAI::CropMoves(vector<Node>* nodes)
 {
-	//TODO
+	nodes->resize(KMaxMovesToCompute);
 }
 
 //--------------------------------------------------------------------------------------------------

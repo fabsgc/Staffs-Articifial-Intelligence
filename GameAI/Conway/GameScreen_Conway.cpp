@@ -12,9 +12,13 @@
 
 GameScreen_Conway::GameScreen_Conway(SDL_Renderer* renderer) : GameScreen(renderer)
 {
-	mMap = new int*[kConwayScreenWidth/kConwayTileDimensions];
-	for(int i =0; i < kConwayScreenWidth/kConwayTileDimensions; i++)
-		mMap[i] = new int[kConwayScreenHeight/kConwayTileDimensions];
+	mMap = new int*[kConwayScreenWidth / kConwayTileDimensions];
+	for (int i = 0; i < kConwayScreenWidth / kConwayTileDimensions; i++)
+		mMap[i] = new int[kConwayScreenHeight / kConwayTileDimensions];
+
+	mMapTemp = new int*[kConwayScreenWidth / kConwayTileDimensions];
+	for (int i = 0; i < kConwayScreenWidth / kConwayTileDimensions; i++)
+		mMapTemp[i] = new int[kConwayScreenHeight / kConwayTileDimensions];
 
 	//Get all required textures.
 	mWhiteTile = new Texture2D(renderer);
@@ -39,7 +43,7 @@ GameScreen_Conway::~GameScreen_Conway()
 	delete mBlackTile;
 	mBlackTile = NULL;
 
-	for(int i =0; i < kConwayScreenWidth/kConwayTileDimensions; i++)
+	for (int i = 0; i < kConwayScreenWidth / kConwayTileDimensions; i++)
 	{
 		delete mMap[i];
 		mMap[i] = NULL;
@@ -52,18 +56,18 @@ GameScreen_Conway::~GameScreen_Conway()
 
 void GameScreen_Conway::Render()
 {
-	for(int x = 0; x < kConwayScreenWidth/kConwayTileDimensions; x++)
+	for (int x = 0; x < kConwayScreenWidth / kConwayTileDimensions; x++)
 	{
-		for(int y = 0; y < kConwayScreenHeight/kConwayTileDimensions; y++)
+		for (int y = 0; y < kConwayScreenHeight / kConwayTileDimensions; y++)
 		{
-			switch(mMap[x][y])
+			switch (mMap[x][y])
 			{
-				case 0:
-					mBlackTile->Render(Vector2D(x*kConwayTileDimensions,y*kConwayTileDimensions));
+			case 0:
+				mBlackTile->Render(Vector2D(x*kConwayTileDimensions, y*kConwayTileDimensions));
 				break;
-				
-				case 1:
-					mWhiteTile->Render(Vector2D(x*kConwayTileDimensions,y*kConwayTileDimensions));
+
+			case 1:
+				mWhiteTile->Render(Vector2D(x*kConwayTileDimensions, y*kConwayTileDimensions));
 				break;
 			}
 		}
@@ -75,33 +79,33 @@ void GameScreen_Conway::Render()
 void GameScreen_Conway::Update(size_t deltaTime, SDL_Event e)
 {
 	//Additional input outside of player.
-	switch(e.type)
+	switch (e.type)
 	{
 		//Deal with mouse click input.
-		case SDL_KEYUP:
-			switch(e.key.keysym.sym)
-			{
-				case SDLK_SPACE:
-					mPause = !mPause;
-				break;
+	case SDL_KEYUP:
+		switch (e.key.keysym.sym)
+		{
+		case SDLK_SPACE:
+			mPause = !mPause;
+			break;
 
-				case SDLK_r:
-					mPause = true;
-					CreateRandomMap(75);
-				break;
+		case SDLK_r:
+			mPause = true;
+			CreateRandomMap(75);
+			break;
 
-				case SDLK_l:
-					mPause = true;
-					LoadMap("Conway/ConwaySeed.xml");
-				break;
-			}
+		case SDLK_l:
+			mPause = true;
+			LoadMap("Conway/ConwaySeed.xml");
+			break;
+		}
 		break;
-	
-		default:
+
+	default:
 		break;
 	}
-	
-	if(!mPause)
+
+	if (!mPause)
 		UpdateMap();
 }
 
@@ -109,13 +113,82 @@ void GameScreen_Conway::Update(size_t deltaTime, SDL_Event e)
 
 void GameScreen_Conway::UpdateMap()
 {
-	//Rules
-	//1. Any living cell with less than 2 live neighbour dies.
-	//2. Any living cell with 2 or 3 live cells lives on to next generation.
-	//3. Any live cell with more than 3 live neighbours dies.
-	//4. Any dead cell with exactly 3 live neighbours becomes a living cell.
+	int neighboursCounter = 0;
 
-	//TODO: Code the above rules.
+	for (int y = 0; y < kConwayScreenHeight / kConwayTileDimensions; y++)
+	{
+		for (int x = 0; x < kConwayScreenWidth / kConwayTileDimensions; x++)
+		{
+			neighboursCounter = countNeighbours(x, y);
+
+			mMapTemp[x][y] = mMap[x][y] && (neighboursCounter == 2 || neighboursCounter == 3) || !mMapTemp[x][y] && neighboursCounter == 3;
+
+			if (mMap[x][y] == 1)
+			{
+				if (neighboursCounter < 2)
+				{
+					mMapTemp[x][y] = 0;
+				}
+				else if (neighboursCounter <= 3)
+				{
+					mMapTemp[x][y] = 1;
+				}
+				else
+				{
+					mMapTemp[x][y] = 0;
+				}
+			}
+			else if (neighboursCounter == 3)
+			{
+				mMapTemp[x][y] = 1;
+			}
+			else
+			{
+				mMapTemp[x][y] = 0;
+			}
+		}
+	}
+
+	for (int x = 0; x < kConwayScreenWidth / kConwayTileDimensions; x++)
+	{
+		for (int y = 0; y < kConwayScreenHeight / kConwayTileDimensions; y++)
+		{
+			mMap[x][y] = mMapTemp[x][y];
+		}
+	}
+}
+
+int GameScreen_Conway::countNeighbours(int x, int y)
+{
+	int neighboursCounter = 0;
+
+	for (int j = -1; j <= 1; j++)
+	{
+		if (y + j < 0 || y + j >= kConwayScreenHeight / kConwayTileDimensions)
+		{
+			continue;
+		}
+
+		for (int i = -1; i <= 1; i++)
+		{
+			if (x + i < 0 || x + i >= kConwayScreenWidth / kConwayTileDimensions)
+			{
+				continue;
+			}
+
+			if (mMap[i + x][j + y] == 1 && (i != x || j != y))
+			{
+				neighboursCounter++;
+			}
+		}
+	}
+
+	if (mMap[x][y] == 1)
+	{
+		neighboursCounter--;
+	}
+
+	return neighboursCounter;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -124,13 +197,13 @@ void GameScreen_Conway::CreateRandomMap(int percentageInactive)
 {
 	int randomNumber = 0;
 
-	for(int x = 0; x < kConwayScreenWidth/kConwayTileDimensions; x++)
+	for (int x = 0; x < kConwayScreenWidth / kConwayTileDimensions; x++)
 	{
-		for(int y = 0; y < kConwayScreenHeight/kConwayTileDimensions; y++)
+		for (int y = 0; y < kConwayScreenHeight / kConwayTileDimensions; y++)
 		{
-			randomNumber = (rand() % 100)+1;
+			randomNumber = (rand() % 100) + 1;
 
-			if(randomNumber > percentageInactive)
+			if (randomNumber > percentageInactive)
 				mMap[x][y] = 1;
 			else
 				mMap[x][y] = 0;
@@ -144,14 +217,14 @@ void GameScreen_Conway::LoadMap(std::string path)
 {
 	//Get the whole xml document.
 	TiXmlDocument doc;
-	if(!doc.LoadFile(path))
+	if (!doc.LoadFile(path))
 	{
 		cerr << doc.ErrorDesc() << endl;
 	}
 
 	//Now get the root element.
 	TiXmlElement* root = doc.FirstChildElement();
-	if(!root)
+	if (!root)
 	{
 		cerr << "Failed to load file: No root element." << endl;
 		doc.Clear();
@@ -159,19 +232,19 @@ void GameScreen_Conway::LoadMap(std::string path)
 	else
 	{
 		//Jump to the first 'objectgroup' element.
-		for(TiXmlElement* groupElement = root->FirstChildElement("objectgroup"); groupElement != NULL; groupElement = groupElement->NextSiblingElement())
+		for (TiXmlElement* groupElement = root->FirstChildElement("objectgroup"); groupElement != NULL; groupElement = groupElement->NextSiblingElement())
 		{
 			string name = groupElement->Attribute("name");
-			if(name == "Seed")
+			if (name == "Seed")
 			{
 				int x = 0;
 				int y = 0;
 
 				//Jump to the first 'object' element - within 'objectgroup'
-				for(TiXmlElement* objectElement = groupElement->FirstChildElement("object"); objectElement != NULL; objectElement = objectElement->NextSiblingElement())
+				for (TiXmlElement* objectElement = groupElement->FirstChildElement("object"); objectElement != NULL; objectElement = objectElement->NextSiblingElement())
 				{
 					string name = objectElement->Attribute("name");
-					if(name == "TileTypes")
+					if (name == "TileTypes")
 					{
 						//Reset x position of map to 0 at start of each element.
 						x = 0;
@@ -179,11 +252,11 @@ void GameScreen_Conway::LoadMap(std::string path)
 						//Split up the comma delimited connections.
 						stringstream ss(objectElement->Attribute("value"));
 						int i;
-						while(ss >> i)
+						while (ss >> i)
 						{
 							mMap[x][y] = i;
 
-							if(ss.peek() == ',')
+							if (ss.peek() == ',')
 								ss.ignore();
 
 							//Increment the x position.
