@@ -75,6 +75,11 @@ private:
 	bool		 mAIOn;
 
 	bool		 mAllowMutation;
+
+	int          mAILandersSorted[kNumberOfAILanders];
+	int          mNumberSelectedAIChromosomes;
+	int          mMaxFitnessValue;
+	int          mSuccess;
 };
 
 //--------------------------------------------------------------------------------------------------
