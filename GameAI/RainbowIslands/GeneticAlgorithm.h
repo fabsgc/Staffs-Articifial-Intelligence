@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NeuralNetworkHeader.h"
+#include "Constants_RainbowIslands.h"
 #include "Genome.h"
 
 class GeneticAlgorithm
@@ -8,6 +9,10 @@ class GeneticAlgorithm
 public:
 	GeneticAlgorithm();
 	~GeneticAlgorithm();
+
+	void AddGenome(GenomePtr& genome);
+
+	std::vector<GenomePtr>& GetGenomes() { return _genomes;  }
 
 	void Reset();
 
@@ -18,6 +23,8 @@ public:
 	void Mutation();
 
 private:
-	std::vector<Genome> _genomes;
-	std::vector<Genome> _selectedGenomes;
+	std::vector<GenomePtr> _genomes;
+	std::vector<GenomePtr> _selectedGenomes;
 };
+
+typedef std::shared_ptr<GeneticAlgorithm> GeneticAlgorithmPtr;

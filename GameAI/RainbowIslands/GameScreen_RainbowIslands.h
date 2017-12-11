@@ -13,6 +13,7 @@
 #include "VirtualJoypad.h"
 
 #include "NeuralNetwork.h"
+#include "GeneticAlgorithm.h"
 
 using namespace::std;
 
@@ -59,7 +60,7 @@ private:
 //--------------------------------------------------------------------------------------------------
 private:
 	Texture2D*				  mBackgroundTexture;
-	CharacterBub*			  mBubCharacter;
+	CharacterBub*			  mBubCharacter; // current characterBub
 	bool					  mCanSpawnRainbow;
 	vector<Character*>		  mEnemies;
 	vector<CharacterFruit*>	  mFruit;
@@ -72,9 +73,12 @@ private:
 
 	bool					  mTriggeredChestSpawns;
 
-	NeuralNetworkPtr          mNeuralNetwork;
-	size_t                    mTimeElapsedNeuralNetwork;
-	JoyPad                    mJoyPad;          
+	GeneticAlgorithmPtr       mGeneticAlgorithm;
+	JoyPad                    mJoyPad;
+
+	UINT                      mTimeElapsedNeuralNetwork;
+	UINT                      mCurrentCharacter;
+	std::vector<NeuralNetworkPtr> mNeuralNetworks;
 };
 
 

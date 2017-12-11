@@ -15,7 +15,7 @@ NeuralNetwork::~NeuralNetwork()
 
 void NeuralNetwork::Initialise()
 {
-	AddLayer(LayerPtr(new Layer(_numberInputNeurons, _numberHiddenNeurons)));
+	AddLayer(LayerPtr(new Layer(_numberHiddenNeurons, _numberInputNeurons)));
 	AddLayer(LayerPtr(new Layer(_numberOutputNeurons, _numberHiddenNeurons)));
 
 	for (auto layer : _layers)
@@ -67,6 +67,29 @@ void NeuralNetwork::SetTargets(std::vector<float>& targets)
 	_targets = targets;
 }
 
+void NeuralNetwork::SetWeights(std::vector<float>& weights)
+{
+	int currentWeight = 0;
+	auto weightBeginIterator = weights.begin();
+	auto weightEndIterator   = weights.begin();
+
+	for (auto layer : _layers)
+	{
+		std::vector<NeuronPtr> neurons = layer->GetNeurons();
+
+		for (auto neuron : neurons)
+		{
+			UINT numberWeight = neuron->GetNumberWeights();
+			weightEndIterator += numberWeight;
+
+			std::vector<float> currentWeights(weightBeginIterator, weightEndIterator);
+
+			weightBeginIterator = weightEndIterator;
+			weightEndIterator = weightBeginIterator;
+		}
+	}
+}
+
 std::vector<float>& NeuralNetwork::GetOutputs()
 {
 	return _outputs;
@@ -75,6 +98,24 @@ std::vector<float>& NeuralNetwork::GetOutputs()
 std::vector<float>& NeuralNetwork::GetTargets()
 {
 	return _targets;
+}
+
+std::vector<float> NeuralNetwork::GetWeights()
+{
+	std::vector<float> weights;
+
+	for (auto layer : _layers)
+	{
+		std::vector<NeuronPtr> neurons = layer->GetNeurons();
+
+		for (auto neuron : neurons)
+		{
+			std::vector<float> weightsTmp = neuron->GetWeights();
+			weights.insert(weights.end(), weightsTmp.begin(), weightsTmp.end());
+		}
+	}
+
+	return weights;
 }
 
 void NeuralNetwork::AddLayer(LayerPtr layer)

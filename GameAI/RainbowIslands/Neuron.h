@@ -11,7 +11,10 @@ public:
 
 	void                Initialise();
 	std::vector<float>& GetWeights();
+	UINT                GetNumberWeights();
 	UINT                GetNumberInputs();
+
+	void                SetWeights(std::vector<float>& weights);
 
 public:
 	static const float DefaultBias;

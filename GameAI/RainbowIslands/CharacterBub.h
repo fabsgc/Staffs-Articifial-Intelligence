@@ -7,6 +7,7 @@
 
 #include "Character.h"
 #include <iostream>
+#include "NeuralNetwork.h"
 
 using namespace::std;
 
@@ -38,12 +39,12 @@ public:
 
 //--------------------------------------------------------------------------------------------------
 private:
-	int		mStartFrame;
-	int		mEndFrame;
-	int		mCurrentFrame;
-	float	mFrameDelay;
+	int		         mStartFrame;
+	int		         mEndFrame;
+	int		         mCurrentFrame;
+	float	         mFrameDelay;
 
-	bool	mOnRainbow;
-	int		mPoints;
+	bool	         mOnRainbow;
+	int		         mPoints;
 };
 #endif //_CHARACTERBUB_H

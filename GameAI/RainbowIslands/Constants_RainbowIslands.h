@@ -19,8 +19,8 @@ const int TILE_WIDTH					= 16;
 const int TILE_HEIGHT					= 16;
 
 //Generic
-const float MOVE_SPEED					= 0.16f;
-const float GRAVITY						= 0.1f;
+const float MOVE_SPEED					= 0.1f;
+const float GRAVITY						= 0.09f;
 const float DEAD_TIME					= 0.5f;
 
 //Characters
@@ -38,7 +38,7 @@ const float JUMP_FORCE_DECREMENT		= 0.008f;
 const float JUMP_FORCE_INITIAL_FRUIT	= 0.29f;
 
 //Level Time.
-const int LEVEL_TIME					= 60000;//60 seconds
+const int LEVEL_TIME					= 12000;//60 seconds
 const int TRIGGER_ANGRY_TIME			= 10000;//10 seconds
 
 //Complete Level.
@@ -52,10 +52,13 @@ const int kTileSpriteSheetHeight		= 5;
 //TODO: Remove for student version.
 const int kNumberOfOutputs				 = 4; // Controls on joypad.
 const int kNumberOfHiddenLayers			 = 1; // 
-const int kNumberOfNeuronsPerHiddenLayer = 3; // 
+const int kNumberOfNeuronsPerHiddenLayer = 100; // 
 
 const int kNumberOfInputs = 5;
-const int kChromosomeSize = 30;
-const int kPopulationSize = 25;
+const int kPopulationSize = 10;
+const int kNumberElements = 176;
+
+const int kNNCrossoverRate = 5000;
+const int kNNMutationRate  = 5000;
 
 #endif //RAINBOW_CONSTANTS_H

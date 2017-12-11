@@ -33,3 +33,13 @@ UINT Neuron::GetNumberInputs()
 {
 	return _numberInputs;
 }
+
+UINT Neuron::GetNumberWeights()
+{
+	return _weights.size();
+}
+
+void Neuron::SetWeights(std::vector<float>& weights)
+{
+	_weights = weights;
+}

@@ -15,9 +15,11 @@ public:
 
 	void                SetInputs(std::vector<float>& inputs);
 	void                SetTargets(std::vector<float>& targets);
+	void                SetWeights(std::vector<float>& weights);
 
 	std::vector<float>& GetTargets();
 	std::vector<float>& GetOutputs();
+	std::vector<float>  GetWeights();
 
 	float               Sigmoid(float activation, float response = 1.0f);
 

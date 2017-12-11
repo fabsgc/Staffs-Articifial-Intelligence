@@ -25,20 +25,23 @@ int RainbowOffsets[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 
 GameScreen_RainbowIslands::GameScreen_RainbowIslands(SDL_Renderer* renderer) 
 	: GameScreen(renderer)
-	, mNeuralNetwork(nullptr)
+	, mGeneticAlgorithm(nullptr)
 	, mTimeElapsedNeuralNetwork(0)
+	, mCurrentCharacter(0)
 {
 	srand(NULL);
 	mLevelMap = NULL;
 	SetUpLevel();
 
-	std::vector<float> v{ 0.5f, 0.6f, 0.7f, 0.8f, 0.3f, 0.3f, 0.4f, 0.9f };
+	for (int i = 0; i < kPopulationSize; i++)
+	{
+		///Neural Network
+		NeuralNetworkPtr neuralNetwork(new NeuralNetwork(kNumberOfInputs, kNumberOfNeuronsPerHiddenLayer, kNumberOfOutputs));
+		neuralNetwork->Initialise();
+		mNeuralNetworks.push_back(neuralNetwork);
+	}
 
-	///Neural Network
-	mNeuralNetwork.reset(new NeuralNetwork(kNumberOfInputs, kNumberOfNeuronsPerHiddenLayer, kNumberOfOutputs));
-	mNeuralNetwork->Initialise();
-	mNeuralNetwork->SetInputs(v);
-	mNeuralNetwork->Run();
+	mGeneticAlgorithm.reset(new GeneticAlgorithm());
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -175,7 +178,7 @@ void GameScreen_RainbowIslands::Update(size_t deltaTime, SDL_Event e)
 	//################################################
 	mTimeElapsedNeuralNetwork += deltaTime;
 
-	if (mTimeElapsedNeuralNetwork >= 120)
+	if (mTimeElapsedNeuralNetwork >= 0)
 	{
 		Vector2D positionCharacter = mBubCharacter->GetPosition();
 		Vector2D nearestFruit;
@@ -221,10 +224,9 @@ void GameScreen_RainbowIslands::Update(size_t deltaTime, SDL_Event e)
 		inputs.push_back(nearestEnemy.y);
 		inputs.push_back(distanceToTop);
 
-		mNeuralNetwork->SetInputs(inputs);
-
-		mNeuralNetwork->Run();
-		std::vector<float>& outputs = mNeuralNetwork->GetOutputs();
+		mNeuralNetworks[mCurrentCharacter]->SetInputs(inputs);
+		mNeuralNetworks[mCurrentCharacter]->Run();
+		std::vector<float>& outputs = mNeuralNetworks[mCurrentCharacter]->GetOutputs();
 
 		mJoyPad.JoyPadUp = false;
 		mJoyPad.JoyPadDown = false;
@@ -276,7 +278,7 @@ void GameScreen_RainbowIslands::Update(size_t deltaTime, SDL_Event e)
 			pos.y -= mBubCharacter->GetCollisionBox().height*0.3f;
 			CreateRainbow(pos, mBubCharacter->GetRainbowsAllowed());
 
-			mCanSpawnRainbow = false;
+			mCanSpawnRainbow = true;
 		}
 	}
 	else if (!VirtualJoypad::Instance()->DownArrow)
@@ -480,6 +482,43 @@ bool GameScreen_RainbowIslands::SetUpLevel()
 
 void GameScreen_RainbowIslands::RestartLevel()
 {
+	//Add genome
+	GenomePtr genome(new Genome());
+	float y = mBubCharacter->GetPosition().y;
+	float fitness =
+		mBubCharacter->GetPoints() +
+		1 / (kRainbowIslandsScreenHeight - mBubCharacter->GetPosition().y);
+
+	genome->SetWeights(mNeuralNetworks[mCurrentCharacter]->GetWeights());
+	genome->SetFitness(fitness);
+	mGeneticAlgorithm->AddGenome(genome);
+
+	cout << "current character : " << mCurrentCharacter << "/" << fitness << endl;
+
+	if (mCurrentCharacter == kPopulationSize - 1)
+	{
+		cout << "evolution" << endl;
+
+		mCurrentCharacter = 0;
+		mGeneticAlgorithm->CalculateFitness();
+
+		//Set Weights
+		std::vector<GenomePtr> genomes = mGeneticAlgorithm->GetGenomes();
+		int i = 0;
+
+		for (auto genome : genomes)
+		{
+			mNeuralNetworks[i]->SetWeights(genome->GetWeights());
+			i++;
+		}
+
+		mGeneticAlgorithm->Reset();
+	}
+	else
+	{
+		mCurrentCharacter++;
+	}
+
 	//Clean up current characters.
 	//Player character.
 	delete mBubCharacter;
