@@ -57,29 +57,42 @@ private:
 	void CreateChest(Vector2D position);
 	void TriggerChestSpawns();
 
+	std::vector<float> GetCharacterEnvironment();
+	std::vector<float> GetTargets(std::vector<float> inputs);
+
+	void DrawDebugInputs();
+
 //--------------------------------------------------------------------------------------------------
 private:
-	Texture2D*				  mBackgroundTexture;
-	CharacterBub*			  mBubCharacter; // current characterBub
-	bool					  mCanSpawnRainbow;
-	vector<Character*>		  mEnemies;
-	vector<CharacterFruit*>	  mFruit;
-	vector<CharacterRainbow*> mRainbows;
-	CharacterChest*			  mChest;
-	LevelMap*				  mLevelMap;
+	Texture2D*				      mBackgroundTexture;
+	CharacterBub*			      mBubCharacter;
+	bool					      mCanSpawnRainbow;
+	vector<Character*>		      mEnemies;
+	vector<CharacterFruit*>	      mFruit;
+	vector<CharacterRainbow*>     mRainbows;
+	CharacterChest*			      mChest;
+	LevelMap*				      mLevelMap;
 
-	size_t					  mTimeToCompleteLevel;
-	bool					  mTriggeredAnger;
+	size_t					      mTimeToCompleteLevel;
+	bool					      mTriggeredAnger;
 
-	bool					  mTriggeredChestSpawns;
+	bool					      mTriggeredChestSpawns;
 
-	GeneticAlgorithmPtr       mGeneticAlgorithm;
-	JoyPad                    mJoyPad;
-
-	UINT                      mTimeElapsedNeuralNetwork;
-	UINT                      mCurrentCharacter;
+	//Neural networks + Genetic algorithm
 	std::vector<NeuralNetworkPtr> mNeuralNetworks;
-};
+	GeneticAlgorithmPtr           mGeneticAlgorithm;
+	JoyPad                        mJoyPad;
 
+	//States recording
+	UINT                          mTimeElapsedLastRunNN;
+	UINT                          mTimeElapsedLevel;
+	float                         mMaxPositionYCharacter;
+
+	//Index of the current character inside the neuralNetwork
+	UINT                          mCurrentNN;
+
+	std::vector<float>            mInputs;
+	Vector2D                      mLastBubCharacterPosition;
+};
 
 #endif //_GAMESCREEN_RAINBOW_H

@@ -16,7 +16,7 @@ void Neuron::Initialise()
 {
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_real_distribution<> dis(-1, 1);
+	std::uniform_real_distribution<> dis(-0.7, 0.7);
 
 	for (UINT i = 0; i < _numberInputs; i++)
 	{
@@ -39,7 +39,17 @@ UINT Neuron::GetNumberWeights()
 	return _weights.size();
 }
 
+float& Neuron::GetOutput()
+{
+	return _output;
+}
+
 void Neuron::SetWeights(std::vector<float>& weights)
 {
 	_weights = weights;
+}
+
+void Neuron::SetOutput(float output)
+{
+	_output = output;
 }

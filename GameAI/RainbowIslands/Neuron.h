@@ -13,8 +13,10 @@ public:
 	std::vector<float>& GetWeights();
 	UINT                GetNumberWeights();
 	UINT                GetNumberInputs();
+	float&              GetOutput();
 
 	void                SetWeights(std::vector<float>& weights);
+	void                SetOutput(float output);
 
 public:
 	static const float DefaultBias;
@@ -23,6 +25,9 @@ public:
 private:
 	std::vector<float> _weights;
 	UINT               _numberInputs;
+
+	float              _ativation;
+	float              _output;
 };
 
 typedef std::shared_ptr<Neuron> NeuronPtr;

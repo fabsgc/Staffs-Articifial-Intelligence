@@ -1,41 +1,30 @@
-﻿  GameScreenManager.cpp
+﻿  ChessMoveManager.cpp
   Génération de code en cours...
   Compilation en cours...
   Source.cpp
-  LevelMap.cpp
-  GeneticAlgoritm.cpp
-  GameScreen_RainbowIslands.cpp
-c:\users\fabien\documents\staffs-uni\staffs-articifial-intelligence\gameai\rainbowislands\gamescreen_rainbowislands.cpp(193): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-c:\users\fabien\documents\staffs-uni\staffs-articifial-intelligence\gameai\rainbowislands\gamescreen_rainbowislands.cpp(205): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-c:\users\fabien\documents\staffs-uni\staffs-articifial-intelligence\gameai\rainbowislands\gamescreen_rainbowislands.cpp(214): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-c:\users\fabien\documents\staffs-uni\staffs-articifial-intelligence\gameai\rainbowislands\gamescreen_rainbowislands.cpp(221): warning C4244: 'argument' : conversion de 'double' en 'const float', perte possible de données
-c:\users\fabien\documents\staffs-uni\staffs-articifial-intelligence\gameai\rainbowislands\gamescreen_rainbowislands.cpp(222): warning C4244: 'argument' : conversion de 'double' en 'const float', perte possible de données
-c:\users\fabien\documents\staffs-uni\staffs-articifial-intelligence\gameai\rainbowislands\gamescreen_rainbowislands.cpp(223): warning C4244: 'argument' : conversion de 'double' en 'const float', perte possible de données
-c:\users\fabien\documents\staffs-uni\staffs-articifial-intelligence\gameai\rainbowislands\gamescreen_rainbowislands.cpp(224): warning C4244: 'argument' : conversion de 'double' en 'const float', perte possible de données
-c:\users\fabien\documents\staffs-uni\staffs-articifial-intelligence\gameai\rainbowislands\gamescreen_rainbowislands.cpp(487): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-c:\users\fabien\documents\staffs-uni\staffs-articifial-intelligence\gameai\rainbowislands\gamescreen_rainbowislands.cpp(490): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-  CharacterRainbow.cpp
-  CharacterFruit.cpp
-  CharacterChest.cpp
-  CharacterCaterpillar.cpp
-  CharacterBub.cpp
-  Character.cpp
+  GameScreenManager.cpp
+  GameScreen_Chess.cpp
+c:\users\fabien\documents\staffs-uni\aifg\gameai\chess\gamescreen_chess.cpp(141): warning C4244: '=' : conversion de 'const float' en 'std::size_t', perte possible de données
+  ChessPlayerAI.cpp
+  ChessPlayer.cpp
   Génération de code en cours...
-  GameAI.vcxproj -> C:\Users\FABIEN\Documents\staffs-uni\Staffs-Articifial-Intelligence\Debug\GameAI.exe
-  GameAI.vcxproj -> C:\Users\FABIEN\Documents\staffs-uni\Staffs-Articifial-Intelligence\Debug\GameAI.pdb (Full PDB)
+  GameAI.vcxproj -> C:\Users\FABIEN\Documents\staffs-uni\AIFG\Debug\GameAI.exe
+  GameAI.vcxproj -> C:\Users\FABIEN\Documents\staffs-uni\AIFG\Debug\GameAI.pdb (Full PDB)
 
 Résumé de performance des projets :
-    13014 ms  C:\Users\FABIEN\Documents\staffs-uni\Staffs-Articifial-Intelligence\GameAI\GameAI.vcxproj   1 appels
-              13014 ms  Build                                      1 appels
+     9104 ms  C:\Users\FABIEN\Documents\staffs-uni\AIFG\GameAI\GameAI.vcxproj   1 appels
+               9104 ms  Build                                      1 appels
 
 Résumé de performance cible :
         0 ms  AfterResourceCompile                       1 appels
+        0 ms  PrepareResourceNames                       1 appels
         0 ms  CreateCustomManifestResourceNames          1 appels
-        0 ms  ComputeLinkInputsFromProject               1 appels
+        0 ms  ComputeManifestInputsTargets               1 appels
         0 ms  ComputeCLGeneratedLinkInputs               1 appels
         0 ms  ComputeCustomBuildOutput                   1 appels
         0 ms  ComputeManifestGeneratedLinkerInputs       1 appels
         0 ms  ComputeRCGeneratedLinkInputs               1 appels
+        0 ms  ComputeRCOutputs                           1 appels
         0 ms  BeforeLink                                 1 appels
         0 ms  ComputeLegacyManifestEmbedding             1 appels
         0 ms  BuildLinkTraverse                          1 appels
@@ -43,12 +32,12 @@ Résumé de performance cible :
         0 ms  _BuildCompileAction                        1 appels
         0 ms  AfterBuildCompileEvent                     1 appels
         0 ms  _ResourceCompile                           1 appels
+        0 ms  MakeDirsForResourceCompile                 1 appels
         0 ms  BeforeResourceCompile                      1 appels
         0 ms  _ClCompile                                 1 appels
         0 ms  AfterClCompile                             1 appels
+        0 ms  PreLinkEvent                               1 appels
         0 ms  SelectClCompile                            1 appels
-        0 ms  PrepareResourceNames                       1 appels
-        0 ms  SelectCustomBuild                          1 appels
         0 ms  AfterLink                                  1 appels
         0 ms  _ALink                                     1 appels
         0 ms  AfterBuild                                 1 appels
@@ -62,77 +51,75 @@ Résumé de performance cible :
         0 ms  _Deploy                                    1 appels
         0 ms  _Appverifier                               1 appels
         0 ms  CreateSatelliteAssemblies                  1 appels
+        0 ms  _GenerateSatelliteAssemblyInputs           1 appels
         0 ms  _BscMake                                   1 appels
         0 ms  MakeDirsForBscMake                         1 appels
         0 ms  ComputeCLCompileGeneratedSbrFiles          1 appels
+        0 ms  _XdcMake                                   1 appels
         0 ms  MakeDirsForXdcMake                         1 appels
         0 ms  ResolvedXDCMake                            1 appels
         0 ms  _Manifest                                  1 appels
         0 ms  _Link                                      1 appels
-        0 ms  _SelectedFiles                             1 appels
+        0 ms  SelectCustomBuild                          1 appels
         0 ms  Build                                      1 appels
-        0 ms  BuildGenerateSourcesTraverse               1 appels
-        0 ms  PlatformPrepareForBuild                    1 appels
-        0 ms  GetResolvedWinMD                           1 appels
-        0 ms  GetInstalledSDKLocations                   1 appels
-        0 ms  ResolveSDKReferences                       1 appels
-        0 ms  ExpandSDKReferences                        1 appels
-        0 ms  BeforeResolveReferences                    1 appels
-        0 ms  ComputeReferenceCLInput                    1 appels
-        0 ms  AfterResolveReferences                     1 appels
-        0 ms  ResolveReferences                          1 appels
-        0 ms  CheckWindowsSDK71A                         1 appels
-        0 ms  BeforeBuildGenerateSources                 1 appels
-        0 ms  PreBuildEvent                              1 appels
-        0 ms  _Xsd                                       1 appels
-        0 ms  GetFrameworkPaths                          1 appels
-        0 ms  ComputeMIDLGeneratedCompileInputs          1 appels
         0 ms  _SplitProjectReferencesByFileExistence     1 appels
+        0 ms  GetFrameworkPaths                          1 appels
+        0 ms  BeforeBuildGenerateSources                 1 appels
+        0 ms  ResolveReferences                          1 appels
+        0 ms  _SelectedFiles                             1 appels
+        0 ms  ResolveSDKReferences                       1 appels
+        0 ms  _Xsd                                       1 appels
+        0 ms  MakeDirsForMidl                            1 appels
+        0 ms  ComputeMIDLGeneratedCompileInputs          1 appels
+        0 ms  AfterMidl                                  1 appels
         0 ms  _Midl                                      1 appels
+        0 ms  BuildGenerateSourcesTraverse               1 appels
         0 ms  AfterBuildGenerateSources                  1 appels
+        0 ms  _BuildGenerateSourcesAction                1 appels
+        0 ms  BuildGenerateSources                       1 appels
+        0 ms  BuildCompileTraverse                       1 appels
+        0 ms  AfterResolveReferences                     1 appels
+        0 ms  ExpandSDKReferences                        1 appels
+        0 ms  BeforeClCompile                            1 appels
+        0 ms  CheckWindowsSDK71A                         1 appels
+        0 ms  ComputeReferenceCLInput                    1 appels
+        0 ms  BeforeResolveReferences                    1 appels
+        0 ms  _PrepareForReferenceResolution             1 appels
+        0 ms  PlatformPrepareForBuild                    1 appels
         0 ms  AfterBuildGenerateSourcesEvent             1 appels
         0 ms  PrepareProjectReferences                   1 appels
-        0 ms  _PrepareForBuild                           1 appels
-        0 ms  ComputeCLInputPDBName                      1 appels
-        0 ms  _BuildGenerateSourcesAction                1 appels
-        0 ms  BeforeClCompile                            1 appels
-        0 ms  BuildGenerateSources                       1 appels
-        0 ms  AfterMidl                                  1 appels
-        0 ms  BuildCompileTraverse                       1 appels
-        1 ms  MakeDirsForResourceCompile                 1 appels
-        1 ms  ComputeRCOutputs                           1 appels
-        1 ms  ComputeManifestInputsTargets               1 appels
-        1 ms  NoSupportCodeAnalysisXP                    1 appels
-        1 ms  AssignTargetPaths                          1 appels
-        1 ms  _GetProjectReferenceTargetFrameworkProperties   1 appels
-        1 ms  ComputeLinkImportLibraryOutputsForClean    1 appels
-        1 ms  GetCopyToOutputDirectoryItems              1 appels
-        1 ms  MakeDirsForLink                            1 appels
-        1 ms  _HandlePackageFileConflicts                1 appels
-        1 ms  ResolveAssemblyReferences                  1 appels
-        1 ms  PreLinkEvent                               1 appels
-        1 ms  _PrepareForReferenceResolution             1 appels
-        1 ms  GetReferenceAssemblyPaths                  1 appels
-        1 ms  ResolveProjectReferences                   1 appels
-        1 ms  _GenerateSatelliteAssemblyInputs           1 appels
         1 ms  DoLinkOutputFilesMatch                     1 appels
-        1 ms  SplitResourcesByCulture                    1 appels
         1 ms  ComputeCLCompileGeneratedXDCFiles          1 appels
+        1 ms  ComputeLinkImportLibraryOutputsForClean    1 appels
         1 ms  AssignProjectConfiguration                 1 appels
-        1 ms  _XdcMake                                   1 appels
+        1 ms  GetResolvedWinMD                           1 appels
+        1 ms  NoSupportCodeAnalysisXP                    1 appels
+        1 ms  ResolveProjectReferences                   1 appels
         1 ms  CopyFilesToOutputDirectory                 1 appels
-        1 ms  FixupCLCompileOptions                      1 appels
-        1 ms  MakeDirsForMidl                            1 appels
+        1 ms  PreBuildEvent                              1 appels
+        1 ms  GetInstalledSDKLocations                   1 appels
+        1 ms  ResolveAssemblyReferences                  1 appels
+        1 ms  _HandlePackageFileConflicts                1 appels
         1 ms  ComputeLinkSwitches                        1 appels
+        1 ms  GetReferenceAssemblyPaths                  1 appels
+        1 ms  AssignTargetPaths                          1 appels
+        1 ms  SplitResourcesByCulture                    1 appels
+        1 ms  ComputeLinkInputsFromProject               1 appels
+        1 ms  ComputeCLInputPDBName                      1 appels
+        1 ms  _PrepareForBuild                           1 appels
+        1 ms  GetCopyToOutputDirectoryItems              1 appels
+        1 ms  SetBuildDefaultEnvironmentVariables        1 appels
         2 ms  MakeDirsForCl                              1 appels
+        2 ms  FinalizeBuildStatus                        1 appels
+        2 ms  _GetProjectReferenceTargetFrameworkProperties   1 appels
+        2 ms  MakeDirsForLink                            1 appels
         2 ms  RegisterOutput                             1 appels
-        2 ms  SetBuildDefaultEnvironmentVariables        1 appels
-        2 ms  ComputeCLOutputs                           1 appels
-        3 ms  FinalizeBuildStatus                        1 appels
-        4 ms  _CheckForInvalidConfigurationAndPlatform   1 appels
-        5 ms  InitializeBuildStatus                      1 appels
-        7 ms  PrepareForBuild                            1 appels
-       11 ms  WarnCompileDuplicatedFilename              1 appels
-       22 ms  SetCABuildNativeEnvironmentVariables       1 appels
-      491 ms  Link                                       1 appels
-    12435 ms  ClCompile                                  1 appels
+        3 ms  ComputeCLOutputs                           1 appels
+        6 ms  _CheckForInvalidConfigurationAndPlatform   1 appels
+        6 ms  FixupCLCompileOptions                      1 appels
+        8 ms  PrepareForBuild                            1 appels
+        8 ms  InitializeBuildStatus                      1 appels
+       16 ms  SetCABuildNativeEnvironmentVariables       1 appels
+       25 ms  WarnCompileDuplicatedFilename              1 appels
+      400 ms  Link                                       1 appels
+     8594 ms  ClCompile                                  1 appels

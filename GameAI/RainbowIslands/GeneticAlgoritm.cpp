@@ -40,7 +40,7 @@ void GeneticAlgorithm::Selection()
 	//We get genome which have a quite good fitness
 	for (auto genome : _genomes)
 	{
-		if (genome->GetFitness() > 0.6f)
+		if (genome->GetFitness() > 0.7f)
 		{
 			_selectedGenomes.push_back(genome);
 		}

@@ -45,6 +45,6 @@ const unsigned int kTotalNumberOfStartingPieces = 16;
 
 const unsigned int kInfinity = 200795;
 
-const unsigned int KMaxMovesToCompute = 10;
+const unsigned int KMaxMovesToCompute = 32;
 
 #endif //CHESSCONSTANTS_H

@@ -12,14 +12,17 @@ public:
 
 	void                Initialise();
 	void                Run();
+	void                BackPropagation(const std::vector<float>& targets, const std::vector<float>& inputs);
 
-	void                SetInputs(std::vector<float>& inputs);
-	void                SetTargets(std::vector<float>& targets);
-	void                SetWeights(std::vector<float>& weights);
+	void                SetInputs(const std::vector<float>& inputs);
+	void                SetTargets(const std::vector<float>& targets);
+	void                SetWeights(const std::vector<float>& weights);
+	void                SetLearningRate(const float& learningRate);
 
 	std::vector<float>& GetTargets();
 	std::vector<float>& GetOutputs();
 	std::vector<float>  GetWeights();
+	float&              GetLearningRate();
 
 	float               Sigmoid(float activation, float response = 1.0f);
 

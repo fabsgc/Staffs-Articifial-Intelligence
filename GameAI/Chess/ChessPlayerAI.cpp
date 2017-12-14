@@ -349,7 +349,9 @@ int ChessPlayerAI::ScoreTheBoard(Node node)
 
 	//We score the black
 
-	if (mTeamColour == COLOUR_BLACK)
+	BoardPiece piece = node.boardState.currentLayout[node.currentMove.from_X][node.currentMove.from_Y];
+
+	if (piece.colour == COLOUR_BLACK)
 	{
 		robertScore = scoreBlack - scoreWhite;
 	}

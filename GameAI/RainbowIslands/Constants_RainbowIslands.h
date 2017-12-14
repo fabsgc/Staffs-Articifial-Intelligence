@@ -38,7 +38,7 @@ const float JUMP_FORCE_DECREMENT		= 0.008f;
 const float JUMP_FORCE_INITIAL_FRUIT	= 0.29f;
 
 //Level Time.
-const int LEVEL_TIME					= 12000;//60 seconds
+const int LEVEL_TIME					= 60000;//60 seconds
 const int TRIGGER_ANGRY_TIME			= 10000;//10 seconds
 
 //Complete Level.
@@ -52,13 +52,25 @@ const int kTileSpriteSheetHeight		= 5;
 //TODO: Remove for student version.
 const int kNumberOfOutputs				 = 4; // Controls on joypad.
 const int kNumberOfHiddenLayers			 = 1; // 
-const int kNumberOfNeuronsPerHiddenLayer = 100; // 
+const int kNumberOfNeuronsPerHiddenLayer = 16; // 
 
-const int kNumberOfInputs = 5;
+const int kNumberOfInputs = 27;
 const int kPopulationSize = 10;
-const int kNumberElements = 176;
 
-const int kNNCrossoverRate = 5000;
-const int kNNMutationRate  = 5000;
+const int kNNCrossoverRate = 3000;
+const int kNNMutationRate  = 1000;
+
+const int kInputNone = -1;
+const int kInputEmpty = 0;
+const int kInputObstacle = 1;
+const int kInputCharacterFruit = 2;
+const int kInputCharacterEnemy = 3;
+const int kInputCharacterRainbow = 4;
+const int kInputCharacterChest = 5;
+
+const int kOutputUp     = 0;
+const int kOutputDown   = 1;
+const int kOutputLeft   = 2;
+const int kOutputRight  = 3;
 
 #endif //RAINBOW_CONSTANTS_H

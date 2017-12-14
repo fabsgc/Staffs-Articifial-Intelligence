@@ -23,11 +23,14 @@ int RainbowOffsets[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 						 23,22,22,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0, };
 //--------------------------------------------------------------------------------------------------
 
-GameScreen_RainbowIslands::GameScreen_RainbowIslands(SDL_Renderer* renderer) 
+GameScreen_RainbowIslands::GameScreen_RainbowIslands(SDL_Renderer* renderer)
 	: GameScreen(renderer)
 	, mGeneticAlgorithm(nullptr)
-	, mTimeElapsedNeuralNetwork(0)
-	, mCurrentCharacter(0)
+	, mTimeElapsedLastRunNN(0)
+	, mTimeElapsedLevel(0)
+	, mMaxPositionYCharacter(0.0f)
+	, mCurrentNN(0)
+	, mLastBubCharacterPosition(Vector2D(0.0f, 0.0f))
 {
 	srand(NULL);
 	mLevelMap = NULL;
@@ -109,6 +112,8 @@ void GameScreen_RainbowIslands::Render()
 	//Draw the player.
 	mBubCharacter->Render();
 	DrawDebugCircle(mBubCharacter->GetCentralPosition(), mBubCharacter->GetCollisionRadius(), 0, 255, 0);
+
+	DrawDebugInputs();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -176,11 +181,12 @@ void GameScreen_RainbowIslands::Update(size_t deltaTime, SDL_Event e)
 	UpdateRainbows(deltaTime, e);
 
 	//################################################
-	mTimeElapsedNeuralNetwork += deltaTime;
+	mTimeElapsedLastRunNN += deltaTime;
+	mTimeElapsedLevel += deltaTime;
 
-	if (mTimeElapsedNeuralNetwork >= 0)
+	if (mTimeElapsedLastRunNN >= 0)
 	{
-		Vector2D positionCharacter = mBubCharacter->GetPosition();
+		/*Vector2D positionCharacter = mBubCharacter->GetPosition();
 		Vector2D nearestFruit;
 		Vector2D nearestEnemy;
 		float    distanceToTop           = 0.0f;
@@ -222,23 +228,57 @@ void GameScreen_RainbowIslands::Update(size_t deltaTime, SDL_Event e)
 		inputs.push_back(nearestFruit.y);
 		inputs.push_back(nearestEnemy.x);
 		inputs.push_back(nearestEnemy.y);
-		inputs.push_back(distanceToTop);
+		inputs.push_back(distanceToTop);*/
 
-		mNeuralNetworks[mCurrentCharacter]->SetInputs(inputs);
-		mNeuralNetworks[mCurrentCharacter]->Run();
-		std::vector<float>& outputs = mNeuralNetworks[mCurrentCharacter]->GetOutputs();
+		//Get Environment data
+		mInputs = GetCharacterEnvironment();
 
+		//Get current position
+		mInputs.push_back(mBubCharacter->GetCentralPosition().y);
+
+		//Is the player currently stuck
+		if (mLastBubCharacterPosition.x == mBubCharacter->GetCentralPosition().x &&
+			mLastBubCharacterPosition.y == mBubCharacter->GetCentralPosition().y)
+		{
+			mInputs.push_back(1.0f);
+		}
+		else
+		{
+			mInputs.push_back(0.0f);
+		}
+
+		//Start neural network
+		mNeuralNetworks[mCurrentNN]->SetInputs(mInputs);
+		mNeuralNetworks[mCurrentNN]->Run();
+		std::vector<float>& outputs = mNeuralNetworks[mCurrentNN]->GetOutputs();
+
+		mMaxPositionYCharacter = mBubCharacter->GetCentralPosition().y;
+
+		//Reset JoyPad
+		mJoyPad.JoyPadUp = true;
+		mJoyPad.JoyPadDown = true;
+		mJoyPad.JoyPadLeft = true;
+		mJoyPad.JoyPadRight = true;
+
+		VirtualJoypad::Instance()->SetJoypadState(mJoyPad, false);
+
+		//Update JoyPad
 		mJoyPad.JoyPadUp = false;
 		mJoyPad.JoyPadDown = false;
 		mJoyPad.JoyPadLeft = false;
 		mJoyPad.JoyPadRight = false;
 
-		if (outputs[0] >= 0.5f) mJoyPad.JoyPadUp    = true;
-		if (outputs[1] >= 0.5f) mJoyPad.JoyPadDown  = true;
-		if (outputs[2] >= 0.5f) mJoyPad.JoyPadLeft  = true;
-		if (outputs[3] >= 0.5f) mJoyPad.JoyPadRight = true;
+		std::vector<float> targets = GetTargets(mInputs);
+		outputs = mNeuralNetworks[mCurrentNN]->GetOutputs();
+		mNeuralNetworks[mCurrentNN]->BackPropagation(targets, mInputs);
+		//outputs = targets;
 
-		mTimeElapsedNeuralNetwork = 0;
+		if (outputs[0] >= 0.9f) mJoyPad.JoyPadUp    = true;
+		if (outputs[1] >= 0.9f) mJoyPad.JoyPadDown  = true;
+		if (outputs[2] >= 0.9f) mJoyPad.JoyPadLeft  = true;
+		if (outputs[3] >= 0.9f) mJoyPad.JoyPadRight = true;
+
+		mTimeElapsedLastRunNN = 0;
 	}
 
 	VirtualJoypad::Instance()->SetJoypadState(mJoyPad);
@@ -274,11 +314,11 @@ void GameScreen_RainbowIslands::Update(size_t deltaTime, SDL_Event e)
 			Vector2D pos = mBubCharacter->GetPosition();
 			pos.x += 10;
 			if (mBubCharacter->GetFacing() == FACING_RIGHT)
-				pos.x += mBubCharacter->GetCollisionBox().width-15;
+				pos.x += mBubCharacter->GetCollisionBox().width-10;
 			pos.y -= mBubCharacter->GetCollisionBox().height*0.3f;
 			CreateRainbow(pos, mBubCharacter->GetRainbowsAllowed());
 
-			mCanSpawnRainbow = true;
+			mCanSpawnRainbow = false;
 		}
 	}
 	else if (!VirtualJoypad::Instance()->DownArrow)
@@ -482,24 +522,33 @@ bool GameScreen_RainbowIslands::SetUpLevel()
 
 void GameScreen_RainbowIslands::RestartLevel()
 {
+	if (mBubCharacter->GetCentralPosition().y < 75)
+	{
+		cout << "######### Won !" << endl;
+	}
+
 	//Add genome
 	GenomePtr genome(new Genome());
 	float y = mBubCharacter->GetPosition().y;
 	float fitness =
-		mBubCharacter->GetPoints() +
-		1 / (kRainbowIslandsScreenHeight - mBubCharacter->GetPosition().y);
+		mBubCharacter->GetPoints() * 0.8f
+		+ 1 / (kRainbowIslandsScreenHeight - mMaxPositionYCharacter) * 1.0f
+		+ (mTimeElapsedLevel / 1000) * 0.2f;
 
-	genome->SetWeights(mNeuralNetworks[mCurrentCharacter]->GetWeights());
+	genome->SetWeights(mNeuralNetworks[mCurrentNN]->GetWeights());
 	genome->SetFitness(fitness);
 	mGeneticAlgorithm->AddGenome(genome);
 
-	cout << "current character : " << mCurrentCharacter << "/" << fitness << endl;
+	cout << "current character : " << mCurrentNN << "/" << fitness << "/" << mMaxPositionYCharacter << endl;
 
-	if (mCurrentCharacter == kPopulationSize - 1)
+	mTimeElapsedLevel = 0;
+	mMaxPositionYCharacter = 0.0f;
+
+	if (mCurrentNN == kPopulationSize - 1)
 	{
 		cout << "evolution" << endl;
 
-		mCurrentCharacter = 0;
+		mCurrentNN = 0;
 		mGeneticAlgorithm->CalculateFitness();
 
 		//Set Weights
@@ -516,7 +565,7 @@ void GameScreen_RainbowIslands::RestartLevel()
 	}
 	else
 	{
-		mCurrentCharacter++;
+		mCurrentNN++;
 	}
 
 	//Clean up current characters.
@@ -709,6 +758,7 @@ void GameScreen_RainbowIslands::CreateRainbow(Vector2D position, int numberOfRai
 {
 	double xOffset   = 0.0;
 	float  spwnDelay = 0.0f;
+
 	do
 	{
 		if(mBubCharacter->GetFacing() == FACING_LEFT)
@@ -722,7 +772,7 @@ void GameScreen_RainbowIslands::CreateRainbow(Vector2D position, int numberOfRai
 		
 		mRainbows.push_back(rainbowCharacter);
 		numberOfRainbows--;
-		xOffset = rainbowCharacter->GetCollisionBox().width-10.0;
+		xOffset = rainbowCharacter->GetCollisionBox().width-5.0;
 		spwnDelay += 200;
 	} while (numberOfRainbows > 0);
 }
@@ -756,22 +806,329 @@ void GameScreen_RainbowIslands::TriggerChestSpawns()
 	int xRange			= (int)mChest->GetCollisionBox().width;
 	int xDeductRange	= (int)mChest->GetCollisionBox().width/2;
 
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
-	CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
+CreateFruit(Vector2D(pos.x + (rand() % xRange) - xDeductRange, pos.y), true);
 
-	mTriggeredChestSpawns = true;
+mTriggeredChestSpawns = true;
 }
 
 //--------------------------------------------------------------------------------------------------
+
+std::vector<float> GameScreen_RainbowIslands::GetCharacterEnvironment()
+{
+	std::vector<float> data;
+	Vector2D characterPosition = mBubCharacter->GetCentralPosition();
+	int characterPositionX = characterPosition.x / TILE_WIDTH;
+	int characterPositionY = characterPosition.y / TILE_HEIGHT;
+	Vector2D startSearchinPosition = characterPosition;
+
+	//0 = nothing
+	//1 = obstacle
+	//2 = loot
+	//3 = enemy
+	//4 = rainbow
+	//5 = chest
+
+	for (int y = characterPositionY - 2; y <= characterPositionY + 2; y++)
+	{
+		for (int x = characterPositionX - 2; x <= characterPositionX + 2; x++)
+		{
+			int type = kInputNone;
+
+			//We look for obstacle
+			if (x > 0 && y > 0 && x < MAP_WIDTH)
+			{
+				type = mLevelMap->GetCollisionTileAt(y, x);
+			}
+
+			//Then we look for fruits
+			for (auto fruit : mFruit)
+			{
+				Vector2D positionFruit = fruit->GetCentralPosition();
+				float distance = positionFruit.Distance(Vector2D(x*TILE_WIDTH, y*TILE_HEIGHT));
+
+				if (distance <= 12)
+				{
+					type = kInputCharacterFruit;
+				}
+			}
+
+			//Then we look for rainbows
+			for (auto rainbow : mRainbows)
+			{
+				Vector2D positionRainbow = rainbow->GetCentralPosition();
+				float distance = positionRainbow.Distance(Vector2D(x*TILE_WIDTH, y*TILE_HEIGHT));
+
+				if (distance <= 12)
+				{
+					type = kInputCharacterRainbow;
+				}
+			}
+
+			//Then we look for ennemies
+			for (auto enemy : mEnemies)
+			{
+				Vector2D positionEnemy = enemy->GetCentralPosition();
+				float distance = positionEnemy.Distance(Vector2D(x*TILE_WIDTH, y*TILE_HEIGHT));
+
+				if (distance <= 12)
+				{
+					type = kInputCharacterEnemy;
+				}
+			}
+
+			//Then we look for chest
+			/*if (mChest != nullptr)
+			{
+				Vector2D positionChest = mChest->GetCentralPosition();
+				float distance = positionChest.Distance(Vector2D(x*TILE_WIDTH, y*TILE_HEIGHT));
+
+				if (distance < TILE_WIDTH * 2)
+				{
+					type = kInputCharacterChest;
+				}
+			}*/
+
+			data.push_back(type);
+		}
+	}
+
+	return data;
+}
+
+std::vector<float> GameScreen_RainbowIslands::GetTargets(std::vector<float> inputs)
+{
+	std::vector<float> targets;
+	FACING facing = mBubCharacter->GetFacing();
+
+	for (int i = 0; i < kNumberOfOutputs; i++)
+	{
+		targets.push_back(0.0f);
+	}
+
+	bool onTop = false;
+
+	if (inputs[25] < Y_POSITION_TO_COMPLETE + 10)
+	{
+		onTop = true;
+	}
+
+	//Rainbow below
+	if (inputs[17] == kInputCharacterRainbow && !onTop)
+	{
+		//If enemy above on left
+		if (inputs[7] == kInputCharacterEnemy || inputs[6] == kInputCharacterEnemy || inputs[5] == kInputCharacterEnemy)
+		{
+			targets[kOutputRight] = 1.0f;
+			return targets;
+		}
+
+		//If enemy above on right
+		if (inputs[7] == kInputCharacterEnemy || inputs[8] == kInputCharacterEnemy || inputs[9] == kInputCharacterEnemy  || inputs[9] == kInputCharacterEnemy)
+		{
+			targets[kOutputLeft] = 1.0f;
+			return targets;
+		}
+
+		targets[kOutputUp] = 1.0f;
+
+		if (facing == FACING::FACING_LEFT) targets[kOutputLeft] = 1.0f;
+		else if (facing == FACING::FACING_RIGHT) targets[kOutputRight] = 1.0f;
+
+		return targets;
+	}
+
+	//Enemy on right near
+	if (inputs[13] == kInputCharacterEnemy)
+	{
+		targets[kOutputUp] = 1.0f;
+		return targets;
+	}
+
+	//Enemy on left near
+	if (inputs[11] == kInputCharacterEnemy)
+	{
+		targets[kOutputUp] = 1.0f;
+		return targets;
+	}
+
+	//Enemy on right far
+	if (inputs[14] == kInputObstacle && facing == FACING::FACING_RIGHT)
+	{
+		if (mCanSpawnRainbow && !onTop)
+		{
+			if(mInputs[26] != 1.0f) targets[kOutputDown] = 1.0f;
+			return targets;
+		}
+	}
+
+	//Enemy on left far
+	if (inputs[10] == kInputObstacle && facing == FACING::FACING_LEFT)
+	{
+		if (mCanSpawnRainbow && !onTop && mInputs[26] != 1.0f)
+		{
+			if (mInputs[26] != 1.0f) targets[kOutputDown] = 1.0f;
+			return targets;
+		}
+	}
+
+	//Fruit on right
+	if ((inputs[13] == kInputCharacterFruit || inputs[14] == kInputCharacterFruit) && facing == FACING::FACING_RIGHT)
+	{
+		targets[kOutputUp] = 1.0f;
+		targets[kOutputRight] = 1.0f;
+		return targets;
+	}
+
+	//Fruit on left
+	if ((inputs[10] == kInputCharacterFruit || inputs[11] == kInputCharacterFruit) && facing == FACING::FACING_LEFT)
+	{
+		targets[kOutputUp] = 1.0f;
+		targets[kOutputLeft] = 1.0f;
+		return targets;
+	}
+
+	//Obstacle on right
+	if (inputs[8] == kInputObstacle && facing == FACING::FACING_RIGHT)
+	{
+		if (mCanSpawnRainbow && !onTop)
+		{
+			if (mInputs[26] != 1.0f) targets[kOutputDown] = 1.0f;
+			targets[kOutputUp] = 1.0f;
+			targets[kOutputRight] = 1.0f;
+			return targets;
+		}
+	}
+
+	//Obstacle on left
+	if (inputs[6] == kInputObstacle && facing == FACING::FACING_LEFT)
+	{
+		if (mCanSpawnRainbow && !onTop)
+		{
+			if (mInputs[26] != 1.0f) targets[kOutputDown] = 1.0f;
+			targets[kOutputUp] = 1.0f;
+			targets[kOutputLeft] = 1.0f;
+			return targets;
+		}
+	}
+
+	//Hole on right
+	if (inputs[18] == kInputEmpty && facing == FACING::FACING_RIGHT)
+	{
+		if (mCanSpawnRainbow && !onTop)
+		{
+			if (mInputs[26] != 1.0f) targets[kOutputDown] = 1.0f;
+			targets[kOutputUp] = 1.0f;
+			targets[kOutputRight] = 1.0f;
+			return targets;
+		}
+		else
+		{
+			targets[kOutputRight] = 1.0f;
+			return targets;
+		}
+	}
+
+	//Hole on left
+	if (inputs[6] == kInputEmpty && facing == FACING::FACING_LEFT)
+	{
+		if (mCanSpawnRainbow && !onTop)
+		{
+			if (mInputs[26] != 1.0f) targets[kOutputDown] = 1.0f;
+			targets[kOutputUp] = 1.0f;
+			targets[kOutputLeft] = 1.0f;
+			return targets;
+		}
+		else
+		{
+			targets[kOutputLeft] = 1.0f;
+			return targets;
+		}
+	}
+
+	//Nothing on right
+	if (inputs[13] == kInputEmpty && facing == FACING::FACING_RIGHT)
+	{
+		targets[kOutputUp] = 1.0f;
+		targets[kOutputRight] = 1.0f;
+		return targets;
+	}
+
+	//Nothing on left
+	if (inputs[11] == kInputEmpty && facing == FACING::FACING_LEFT)
+	{
+		targets[kOutputUp] = 1.0f;
+		targets[kOutputLeft] = 1.0f;
+		return targets;
+	}
+
+	//Outside on right
+	if (inputs[13] == kInputNone)
+	{
+		targets[kOutputUp] = 1.0f;
+		targets[kOutputLeft] = 1.0f;
+		return targets;
+	}
+
+	//Outside on left
+	if (inputs[11] == kInputNone)
+	{
+		targets[kOutputUp] = 1.0f;
+		targets[kOutputRight] = 1.0f;
+		return targets;
+	}
+
+	return targets;
+}
+
+void GameScreen_RainbowIslands::DrawDebugInputs()
+{
+	Vector2D characterPosition = mBubCharacter->GetCentralPosition();
+
+	int index = 0;
+
+	for (int y = -2; y <= 2; y++)
+	{
+		for (int x = -2; x <= 2; x++)
+		{
+			Vector2D position = characterPosition;
+			position.x += TILE_WIDTH * x;
+			position.y += TILE_HEIGHT * y;
+
+			const int kInputNone = -1;
+			const int kInputEmpty = 0;
+			const int kInputObstacle = 1;
+			const int kInputCharacterFruit = 2;
+			const int kInputCharacterEnemy = 3;
+			const int kInputCharacterRainbow = 4;
+			const int kInputCharacterChest = 5;
+
+			if(mInputs[index] == kInputNone)
+				DrawDebugCircle(position, 8, 0, 0, 0);
+			else if (mInputs[index] == kInputEmpty)
+				DrawDebugCircle(position, 8, 255, 255, 255);
+			else if (mInputs[index] == kInputObstacle)
+				DrawDebugCircle(position, 8, 255, 165, 0);
+			else if (mInputs[index] == kInputCharacterFruit)
+				DrawDebugCircle(position, 8, 0, 255, 0);
+			else if (mInputs[index] == kInputCharacterEnemy)
+				DrawDebugCircle(position, 8, 255, 0, 0);
+			else if (mInputs[index] == kInputCharacterRainbow)
+				DrawDebugCircle(position, 8, 255, 215, 0);
+
+			index++;
+		}
+	}
+}

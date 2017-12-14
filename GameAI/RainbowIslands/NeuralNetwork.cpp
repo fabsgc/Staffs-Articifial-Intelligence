@@ -5,7 +5,7 @@ NeuralNetwork::NeuralNetwork(UINT numberInputNeurons, UINT numberHiddenNeurons, 
 	, _numberHiddenNeurons(numberHiddenNeurons)
 	, _numberOutputNeurons(numberOutputNeurons)
 	, _neuralNetwork(this)
-	, _learningRate(0.5)
+	, _learningRate(0.7)
 {
 }
 
@@ -44,30 +44,84 @@ void NeuralNetwork::Run()
 			UINT numberInputs          = neurons[0]->GetNumberInputs();
 			float neuronInput          = 0.0f;
 
-			for (UINT k = 0; k < numberInputs - 1; ++k)
+			for (UINT k = 0; k < numberInputs - 1; k++)
 			{
-				neuronInput += weights[0] * _inputs[k];
+				neuronInput += weights[k] * _inputs[k];
 			}
 
 			neuronInput += weights[numberInputs - 1] * Neuron::DefaultBias;
-			outputs.push_back(Sigmoid(neuronInput));
+			float output = Sigmoid(neuronInput);
+			outputs.push_back(output);
+			neurons[j]->SetOutput(output);
 		}
 
 		_outputs = outputs;
 	}
 }
 
-void NeuralNetwork::SetInputs(std::vector<float>& inputs)
+void NeuralNetwork::BackPropagation(const std::vector<float>& targets, const std::vector<float>& inputs)
+{
+	//Output layer
+	std::vector<NeuronPtr>& hiddenNeurons = _layers[0]->GetNeurons();
+	std::vector<NeuronPtr>& outputNeurons = _layers[1]->GetNeurons();
+	std::vector<float> outputErrors;
+
+	//For each neuron in output layer
+	for (UINT i = 0; i < outputNeurons.size(); i++)
+	{
+		float output = outputNeurons[i]->GetOutput();
+		//Ek = (tk - ok) * ok (1 - ok)
+		float error = output - targets[i]; //* output - target
+		outputErrors.push_back(error);
+
+		std::vector<float> weights = outputNeurons[i]->GetWeights();
+		
+		for (UINT j = 0; j < outputNeurons.size(); j++)
+		{
+			//Wjk = L * Ek * oj
+			weights[j] += _learningRate * error * hiddenNeurons[j]->GetOutput();
+		}
+		//Wjk = L * Ek * oj (bias)
+		weights[outputNeurons.size()] += _learningRate * error * Neuron::DefaultBias;
+		outputNeurons[i]->SetWeights(weights);
+	}
+
+	//For each neuron in hidden layer
+	for (UINT i = 0; i < hiddenNeurons.size(); i++)
+	{
+		//Ej = ok(1 - ok) * sum(Ek * Wjk)
+		float hiddenError = 0.0f;
+		for (UINT j = 0; j < outputErrors.size(); j++)
+		{
+			hiddenError += outputErrors[j] * outputNeurons[j]->GetWeights()[i];
+		}
+		float output = hiddenNeurons[i]->GetOutput();
+		hiddenError *= (1.0f - output);
+
+		std::vector<float> hiddenWeights = hiddenNeurons[i]->GetWeights();
+		for (UINT j = 0; j < inputs.size(); j++)
+		{
+			hiddenWeights[j] += _learningRate * hiddenError * inputs[j];
+		}
+		hiddenWeights[inputs.size()] += _learningRate * hiddenError * Neuron::DefaultBias;
+	}
+
+	//_learningRate = _learningRate * 0.9;
+
+	//Hidden layer
+}
+
+void NeuralNetwork::SetInputs(const std::vector<float>& inputs)
 {
 	_inputs = inputs;
 }
 
-void NeuralNetwork::SetTargets(std::vector<float>& targets)
+void NeuralNetwork::SetTargets(const std::vector<float>& targets)
 {
 	_targets = targets;
 }
 
-void NeuralNetwork::SetWeights(std::vector<float>& weights)
+void NeuralNetwork::SetWeights(const std::vector<float>& weights)
 {
 	int currentWeight = 0;
 	auto weightBeginIterator = weights.begin();
@@ -88,6 +142,11 @@ void NeuralNetwork::SetWeights(std::vector<float>& weights)
 			weightEndIterator = weightBeginIterator;
 		}
 	}
+}
+
+void NeuralNetwork::SetLearningRate(const float& learningRate)
+{
+	_learningRate = learningRate;
 }
 
 std::vector<float>& NeuralNetwork::GetOutputs()
@@ -116,6 +175,11 @@ std::vector<float> NeuralNetwork::GetWeights()
 	}
 
 	return weights;
+}
+
+float& NeuralNetwork::GetLearningRate()
+{
+	return _learningRate;
 }
 
 void NeuralNetwork::AddLayer(LayerPtr layer)
