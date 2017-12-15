@@ -224,6 +224,25 @@ void GameScreen_Lunar::CalculateFitness()
 {
 	mMaxFitnessValue = 0.0f;
 
+	float maxDistance = 0.0f;
+	float maxTime = 0.0f;
+
+	for (int i = 0; i < kNumberOfAILanders; i++)
+	{
+		float distance = mAILanders[i]->GetCentralPosition().Distance(mPlatformPosition);
+		float time = mAILanders[i]->GetSurvivalTime();
+
+		if (maxDistance < distance)
+		{
+			maxDistance = distance;
+		}
+
+		if (maxTime < time)
+		{
+			maxTime = time;
+		}
+	}
+
 	//Compute fitness value
 	for (int i = 0; i < kNumberOfAILanders; i++)
 	{
@@ -241,10 +260,22 @@ void GameScreen_Lunar::CalculateFitness()
 		{
 			mSuccess++;
 			landingBonus += kLandingBonus;
+			mHasLandedChromosomes[i] = true;
+		}
+		else
+		{
+			mHasLandedChromosomes[i] = false;
 		}
 
-		mFitnessValues[i] = kDistWeight * (1.0f/distance) + kRotWeight * (1.0f / angle) + kAirTimeWeight * mAILanders[i]->GetSurvivalTime() + landingBonus;
+		distance = 1.0f - (distance / maxDistance);
+		angle = 1.0f - (abs(angle) / 180.0f);
+		survivalTime = survivalTime / maxTime;
+
+		float fitness = (kDistWeight * (distance)) + (kRotWeight * (angle)) + (kAirTimeWeight * survivalTime) + (landingBonus);
+		mFitnessValues[i] = fitness;
 		mAILandersSorted[i] = i;
+
+		cout << mFitnessValues[i] << endl;
 
 		if (mMaxFitnessValue < mFitnessValues[i])
 		{
@@ -272,6 +303,7 @@ void GameScreen_Lunar::CalculateFitness()
 void GameScreen_Lunar::Selection()
 {
 	mNumberSelectedAIChromosomes = 0;
+	mNumberLanderChromosomes = 0;
 
 	//Normalize fitness values
 	for (int i = 0; i < kNumberOfAILanders; i++)
@@ -279,23 +311,49 @@ void GameScreen_Lunar::Selection()
 		mFitnessValues[i] = mFitnessValues[i] / mMaxFitnessValue;
 	}
 
-	//Get all chromosomes which fintess superior to 0.7
+	//Get all chromosomes which fintess superior to 0.6
 	for (int i = 0; i < kNumberOfAILanders; i++)
 	{
-		if(mFitnessValues[i] >= 0.7f)
+		if(mFitnessValues[i] >= 0.4f || mHasLandedChromosomes[i])
 		{ 
 			for (int j = 0; j < kNumberOfChromosomeElements; j++)
 			{
-				mSelectedAIChromosomes[mNumberSelectedAIChromosomes][j] =
-					mChromosomes[i][j];
+				mSelectedAIChromosomes[mNumberSelectedAIChromosomes][j] = mChromosomes[i][j];
+			}
+
+			if (mHasLandedChromosomes[i])
+			{
+				mHasLandedSelectedChromosomes[mNumberSelectedAIChromosomes] = true; 
+				mNumberLanderChromosomes++;
+			}	
+			else
+			{
+				mHasLandedSelectedChromosomes[mNumberSelectedAIChromosomes] = false;
 			}
 
 			mNumberSelectedAIChromosomes++;
 		}
 	}
 
-	cout << mNumberSelectedAIChromosomes << endl;
-	cout << mMaxFitnessValue << endl;
+	if (mNumberSelectedAIChromosomes < 2)
+	{
+		for (int j = 0; j < kNumberOfChromosomeElements; j++)
+		{
+			if (mHasLandedChromosomes[0])
+				mHasLandedSelectedChromosomes[1] = true;
+			else
+				mHasLandedSelectedChromosomes[1] = false;
+
+			mSelectedAIChromosomes[1][j] =
+				mSelectedAIChromosomes[0][j];
+		}
+
+		mNumberSelectedAIChromosomes++;
+	}
+
+	cout << "selected : " << mNumberSelectedAIChromosomes << endl;
+	cout << "fitness  : " << mMaxFitnessValue << endl;
+	cout << "landed   : " << mNumberLanderChromosomes << endl;
 
 	Crossover();
 }
@@ -307,7 +365,7 @@ void GameScreen_Lunar::Crossover()
 	//Todo: Code this function.
 
 	//How many elements we take from each parents
-	int chunkSize = kNumberOfChromosomeElements / 10;
+	int chunkSize = kNumberOfChromosomeElements / 4;
 
 	//We select the two parents needed for crossover
 	int parent[2];
@@ -333,14 +391,28 @@ void GameScreen_Lunar::Crossover()
 					else whichParent = 0;
 				}
 			}
+
+			mHasLandedSelectedChromosomes[i] = false;
+
+			if(mNumberSelectedAIChromosomes < 100)
+				mNumberSelectedAIChromosomes++;
 		}
 		else
 		{
-			int k = rand() % kNumberOfAILanders;
+			int k = rand() % mNumberSelectedAIChromosomes;
+
+			if (mHasLandedSelectedChromosomes[k])
+			{
+				mHasLandedSelectedChromosomes[i] = true;
+			}
+			else
+			{
+				mHasLandedSelectedChromosomes[i] = false;
+			}
 
 			for (int j = 0; j < kNumberOfChromosomeElements; j++)
 			{
-				mSelectedAIChromosomes[i][j] = mChromosomes[rand()%kNumberOfAILanders][j];
+				mSelectedAIChromosomes[i][j] = mSelectedAIChromosomes[k][j];
 			}
 		}
 	}
@@ -356,7 +428,12 @@ void GameScreen_Lunar::Mutation()
 	{
 		for (int j = 0; j < kNumberOfChromosomeElements; j++)
 		{
-			if (rand() % 10000 < kMutationRate)
+			float mutationRate = 1.0f;
+
+			if(mNumberLanderChromosomes > 0)
+				mutationRate = ((float)mNumberLanderChromosomes / (float)kNumberOfAILanders);
+
+			if (!mHasLandedSelectedChromosomes[i] && rand() % 10000 < (kMutationRate/mutationRate))
 			{
 				mSelectedAIChromosomes[i][j] = (LunarAction)(rand() % LunarAction_MaxActions);
 			}

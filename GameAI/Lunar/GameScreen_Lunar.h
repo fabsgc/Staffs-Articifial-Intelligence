@@ -66,6 +66,8 @@ private:
 	LunarAction  mChromosomes[kNumberOfAILanders][kNumberOfChromosomeElements];
 	double		 mFitnessValues[kNumberOfAILanders];
 	LunarAction  mSelectedAIChromosomes[kNumberOfAILanders][kNumberOfChromosomeElements];
+	bool         mHasLandedChromosomes[kNumberOfAILanders];
+	bool         mHasLandedSelectedChromosomes[kNumberOfAILanders];
 	int			 mCurrentAction;
 	size_t		 mAccumulatedDeltaTime;
 	int			 mGeneration;
@@ -78,6 +80,7 @@ private:
 
 	int          mAILandersSorted[kNumberOfAILanders];
 	int          mNumberSelectedAIChromosomes;
+	int          mNumberLanderChromosomes;
 	int          mMaxFitnessValue;
 	int          mSuccess;
 };
